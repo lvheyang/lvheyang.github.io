@@ -14,7 +14,7 @@ Ownership 的规则
 数据和变量的交互
 
 * Move 当赋值发生的时候，值会move到另一个变量上。
-* 如果是堆上的数据 如 let s1=String::from(“a”); let s2 = s1; 那么s1 值在move 到s2上之后，s1 就无法使用了。并且离开s2 的作用域，会调用值的 Drop 方法释放内存。
+* 如果是堆上的数据 如 let s1=String::from("a"); let s2 = s1; 那么s1 值在move 到s2上之后，s1 就无法使用了。并且离开s2 的作用域，会调用值的 Drop 方法释放内存。
 * Clone 如果实现了 clone 方法，则可以调用它实现类似其他语言深拷贝的语义
 * Copy 栈上的值，发生赋值move后，原来的变量依然可用，是因为其有Copy 的annotation。
 * Copy 的trait 中不包含任意部分的 含有 Drop 的trait 。如  (i32 , i32) 是 Copy trait，但是 (i32, String) 不是
@@ -64,7 +64,7 @@ Struct
 {% highlight rust %}
 // Instantiate an instance with another instance
 let user2 = User {
-    email : String::from(“abc@abc.com”),
+    email : String::from("abc@abc.com"),
     ..user1
 }
 {% endhighlight %}
