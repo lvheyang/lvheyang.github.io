@@ -48,8 +48,8 @@ panic!
 
 {% highlight rust %}
 enum Result<T, E> {
-Ok(T),
-Err(E),
+  Ok(T),
+  Err(E),
 }
 {% endhighlight %}
 
