@@ -5,8 +5,6 @@ date:   2021-04-21 14:11:54 +0800
 categories: MonetDB/X100 notes
 ---
 
-# 【论文笔记 1】平衡向量化查询引擎和面向带宽优化存储
-
 该系列文章是阅读 [Marcin Zukowski](https://www.linkedin.com/in/marcinzukowski/) 博士毕业论文 [Balancing vectorized query execution with bandwidth-optimized storage](https://dare.uva.nl/search?identifier=5ccbb60a-38b8-4eeb-858a-e7735dd37487)。
 该论文从多个方面综述了现代数据库引擎的发展方向，是一篇经典的综述性论文，通过这篇论文能够快速获得当前数据库的主流发展方向。
 
