@@ -1,114 +1,96 @@
 ---
 layout: post
-title:  "Rust 学习笔记（3）常见数据集合与错误处理"
-date:   2021-04-21 10:24:54 +0800
+title:  "Rust 学习笔记（1）语言基础"
+date:   2021-04-20 14:10:54 +0800
 categories: Rust Notes
 ---
-# Rust 学习笔记三 -- 常用集合类型/错误处理
 
-## 常用集合类型
+Ownership 的规则
 
-集合：与内置的array和tuple不同，数据存储在堆上。常用的集合有：
+* Rust中每个值都有一个变量是它的owenr -- Each value in Rust has a variable that’s called its owner.
+* 每个时刻只能有一个owner -- There can only be one owner at a time.
+* 如果owner已经离开了作用域，那么值会被释放掉 -- When the owner goes out of scope, the value will be dropped.
 
-- vector 线性存储结构，会把数据值按照内存临近的方式进行存储
-- string 字符的集合
-- hash map 存储关联的k-v对
+数据和变量的交互
 
+* Move 当赋值发生的时候，值会move到另一个变量上。
+* 如果是堆上的数据 如 let s1=String::from("a"); let s2 = s1; 那么s1 值在move 到s2上之后，s1 就无法使用了。并且离开s2 的作用域，会调用值的 Drop 方法释放内存。
+* Clone 如果实现了 clone 方法，则可以调用它实现类似其他语言深拷贝的语义
+* Copy 栈上的值，发生赋值move后，原来的变量依然可用，是因为其有Copy 的annotation。
+* Copy 的trait 中不包含任意部分的 含有 Drop 的trait 。如  (i32 , i32) 是 Copy trait，但是 (i32, String) 不是
 
-Vector
+Ownership 和 函数
 
-- vec! 宏创建vector
+* 栈上数据（Copy）类型作为参数传入函数，会用Copy方式传入，在离开函数调用后，在父级函数依然可用
+* 堆上数据（Drop）类型作为参数传入函数，会转移ownership，move到函数里面，离开函数调用后，会触发Drop操作，所以在父级函数就无法再使用了
+* 函数返回值会触发move 操作
+* 如果把数据返回回去，则父函数可以获取并且是继续使用
 
-String
+Reference 和 Borrowing
 
-- 一般指标准库中的String和string slice，但也有其他的String实现
-- 不可以用下标读取，取slice的时候要注意一个char的长度
-
-HashMap
-
-- 可以使用 HashMap::new() 生成，也可以使用 vector 的 zip 命令生成
-- 多次 insert 同一个key可以覆盖值
-- for (k, v) in &map 可以对hashmap进行迭代
-- map.entry(key).or\_insert(value) 可以实现当key不存在的时候进行插入，并且返回一个可变的引用
-- 如果要依赖原有的值对value进行更新，可以使用 or\_insert 返回可变引用。之后使用 \*ref 进行变化计算
-
-
-## 常见错误处理
-
-错误处理
-
-- 可恢复错误：使用 Result<T, E> 机制进行处理
-- 不可恢复错误：使用panic! 宏进行处理
-
-panic!
-
-- --release 默认操作是打印日志，并且unwinding 栈数据，继续进行下去
-- 在 Cargo.toml [profile.release] 加入 panic = 'abort' 可以设置panic的时候退出
-- RUST\_BACKTRACE=1 环境变量可以设置打印出panic时候的调用栈信息
+* 在函数参数中使用引用，我们称之为Borrowing。参数分为
+    * 只读引用
+    * 可变引用
+* 为了避免数据竞态（data race）
+    * 同一时刻一个变量只能有一个mutable 引用
+    * 同一时刻一个变量不能同时有mutable引用和immutable 引用
 
 {% highlight rust %}
-enum Result<T, E> {
-  Ok(T),
-  Err(E),
+// Immutable Reference
+fn calculate_length(s: &String) -> usize {
+s.len()
+}
+
+// Mutable Reference
+fn change(some_string: &mut String) {
+some_string.push_str(", world");
+}
+{% endhighlight %}
+
+Slice
+* string slice 是对于String 部分的引用 `let slice = &s[0..2];`
+* 如果 slice 引用的原始 String，由于slice 不可变引用了 String，则String 在slice引用没有释放掉的时候，不能调用mutable方法
+
+Struct
+* Named Struct
+    * 变量名字如果和字段名字相同，创建实例的时候可以直接去掉字段名
+    * User { email : email } --> User { email }
+    * 可以通过一个实例的值去创建另一个实例
+* Tuple Struct
+    * 字段只有类型，而没有名字。适合于为了取一个名字，区分不同的tuple
+* Unit Struct
+    * 没有任何字段，用来只是为了实现一些没有任何数据字段的 trait
+
+{% highlight rust %}
+// Instantiate an instance with another instance
+let user2 = User {
+email : String::from("abc@abc.com"),
+..user1
 }
 {% endhighlight %}
 
 
-简化错误处理
 
-- 使用unwrap\_or\_else 来简化大量的错误处理代码，即当为ok的时候可以执行unwrap，如果为err的时候执行 else 中的闭包处理错误
-- 使用unwrap 和 expect 简化处理
-    - unwrap 等价于 匹配Ok的时候返回包装值，匹配Err的时候，调用panic! 宏
-        - let f = File::open("hello.txt").unwrap();
-    - expect 与 unwrap 类似，不过可以指定更合适的报错信息
-        - let f = File::open("hello.txt").expect("Failed to open hello.txt");
+Method syntax
+* Method 类似function，唯一不同的是它是定义在struct/enum/trait 对象的上下文里面。类似其他语言的成员方法，实例用 . 调用
+* associated functions 可以定义关联函数，但是他们不引用self，即不需要实例即可以引用。associated functions 类似其他语言的类型静态方法，类型用 :: 调用
+* self 引用可以是只读引用，也可能是可变引用，用 &mut  表示
 
-错误传播
+Enum
+* 定义Enum 类似于为每一个枚举值定义一个Struct 类型。不同的是，Enum 可以把多个类似Struct类型（枚举值）封装在一个Enum类型中
+* 可以为Enum 定义类似Struct 的方法
 
-- 场景：当我们的代码不知道上层业务该如何处理这种类型错误的时候，应当交给上层代码进行错误处理。这个叫做错误传播
-    - 方法一：返回Result，当出现错误的时候返回 Err()
-    - 方法二：使用 ? 操作符。如下代码，如果返回结果是Ok(f)，则会将f 赋值到变量上。如果返回结果是Err，则会直接将错误结果作为函数结果返回。
-        - ? 操作符只能用在返回 Result 的函数内部，如果函数不返回Result，那只有两种方法：
-            - 把接口格式改为返回Result
-            - 使用 match 去处理错误
+Pattern Matching
+* Pattern matching, match 关键词接收一个Enum变量，分支是所有枚举值，如果枚举值有遗漏会产生编译错误。使用 _ 作为占位符表达不匹配其他分支时候的操作
+* if let 命令，可以简化match操作，等价于match的第一个分支。另外也可以配合else使用，等价于 match 的 _ 统配匹配
 
-```
-let mut f = File::open("hello.txt")?;
-
-// 可以链式调用
-File::open("hello.txt")?.read_to_string(&mut s)?;
-```
-
-
-main 函数特殊之处，除了返回空 () 之外，也可以返回Result
-
-```
-use std::error::Error;
-use std::fs::File;
-
-fn main() -> Result<(), Box <dyn Error>> {
-    let f = File::open("hello.txt")?;
-    Ok(())
+{% highlight rust %}
+if let Some(3) = some_u8_value {
+println!("three");
 }
-```
-
-
-
-什么时机panic!
-
-- Examples, Prototype Code, and Tests 适合 panic! 使得样例代码更加简洁易懂
-- 当你比编译器有更多的信息可以判断不会出错的时候，比如 let home: IpAddr = "127.0.0.1".parse().unwrap();
-- 当程序因错误参数会进入错误状态（非预期的，无法很好处理的状态）的时候，使用 panic! 去提醒外部调用者这种错误状态，进而避免这样调用
-
-错误处理的一般指导意见：可预期的错误使用Result 返回，让调用者可以根据返回信息进行错误处理。
-
-自定义类型参数校验
-
-- 定义 new  方法，如果参数不可预期，则panic!，另外参数为私有，只提供公开的get方法。这样就不会通过其他途径创建类型实例使得参数不可预期
-
+{% endhighlight %}
 
 
 Reference:
 
-1. [Common Collections](https://doc.rust-lang.org/book/ch08-00-common-collections.html)
-1. [Error Handling](https://doc.rust-lang.org/book/ch09-00-error-handling.html)
+1. [Rust-lang the book](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html)
