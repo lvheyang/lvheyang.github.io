@@ -47,10 +47,10 @@ panic!
 - RUST\_BACKTRACE=1 环境变量可以设置打印出panic时候的调用栈信息
 
 {% highlight rust %}
-enum Result<T, E> \{
-Ok(T),
-Err(E),
-\}
+enum Result<T, E> {
+  Ok(T),
+  Err(E),
+}
 {% endhighlight %}
 
 
