@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Rust 学习笔记（2）模块系统"
+title:  "[Rust] 模块系统"
 date:   2021-04-20 21:01:54 +0800
 categories: Rust Notes
 ---

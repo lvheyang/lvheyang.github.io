@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Rust 学习笔记（5）自动化测试"
+title:  "[Rust] 自动化测试"
 date:   2021-04-22 10:10:54 +0800
 categories: Rust Notes
 ---

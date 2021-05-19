@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Rust 学习笔记（4）泛型和生命周期"
+title:  "[Rust] 泛型和生命周期"
 date:   2021-04-21 21:11:54 +0800
 categories: Rust Notes
 ---

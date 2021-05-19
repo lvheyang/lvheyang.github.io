@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "【论文笔记 1】平衡向量化查询引擎和面向带宽优化存储"
+title:  "[向量化] 硬件发展趋势"
 date:   2021-04-21 14:11:54 +0800
 categories: MonetDB/X100 notes
 ---

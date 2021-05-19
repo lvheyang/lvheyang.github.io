@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Rust 学习笔记（6）命令行小工具实践"
+title:  "[Rust] 命令行小工具实践"
 date:   2021-04-22 13:22:54 +0800
 categories: Rust Notes
 ---

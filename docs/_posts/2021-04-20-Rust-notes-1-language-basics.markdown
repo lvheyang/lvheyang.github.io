@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Rust 学习笔记（1）语言基础"
+title:  "[Rust] 语言基础"
 date:   2021-04-20 14:10:54 +0800
 categories: Rust Notes
 ---

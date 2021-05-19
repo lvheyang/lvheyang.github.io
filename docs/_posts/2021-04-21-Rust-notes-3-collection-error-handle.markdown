@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Rust 学习笔记（3）常见数据集合与错误处理"
+title:  "[Rust] 常见数据集合与错误处理"
 date:   2021-04-21 10:24:54 +0800
 categories: Rust Notes
 ---
